@@ -14,7 +14,8 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.MusalaTask"
         android:usesCleartextTraffic="true">
-        <activity android:name=".views.weatherMainScreen.MainActivity">
+        <activity android:name=".views.weatherMainScreen.MainActivity"
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

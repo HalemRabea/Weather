@@ -26,20 +26,24 @@ import java.util.*
 import kotlin.math.roundToInt
 
 @AndroidEntryPoint
-class MainActivity : AppCompatActivity() ,LocationListener {
+class MainActivity : AppCompatActivity(), LocationListener {
 
     private lateinit var binding: ActivityMainBinding
     private val viewModel by viewModels<WeatherViewModel>()
-    lateinit var locationManager:LocationManager
+    lateinit var locationManager: LocationManager
 
     @SuppressLint("MissingPermission")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
-        val view = binding.root
-        setContentView(view)
+        setContentView(binding.root)
+        bind()
         observeLiveData()
+        getLocation()
 
+    }
+
+    fun bind() {
         binding.searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String?): Boolean {
                 viewModel.getDataFromServer(query, null, null)
@@ -51,79 +55,64 @@ class MainActivity : AppCompatActivity() ,LocationListener {
             }
 
         })
-        getLocation()
-        binding.myLocation.setOnClickListener{
+        binding.myLocation.setOnClickListener {
             getLocation()
         }
-    }
-
-    fun bindData(weatherResponseModel: WeatherResponseModel) {
         binding.apply {
             lifecycleOwner = this@MainActivity
             executePendingBindings()
-            humidity.text=weatherResponseModel.main.humidity.toString()+"%"
-            if (weatherResponseModel.weather.isNotEmpty()){
-                weatherDescription.text= weatherResponseModel.weather[0].description
-                weatherIcon.visibility= View.VISIBLE
-                weatherIcon.loadImage(
-                    "http://openweathermap.org/img/wn/${weatherResponseModel.weather[0].icon}@2x.png",
-                    getProcessDrawable(weatherIcon.context)
-                )
-            }
-            else
-            {
-                    weatherDescription.text= ""
-                    weatherIcon.visibility= View.INVISIBLE
-                }
-
-
-            temp.text="${weatherResponseModel.main.temp.roundToInt()}\u00B0  "//for Fahrenheit  u2109 for celiouc u2103
-            wind.text="${weatherResponseModel.wind.speed} kmph"
-            windDirection.text=when(weatherResponseModel.wind.deg){
-                in 0..45 -> "E"
-                in 45..135 -> "N"
-                in 135..225 -> "W"
-                in 225..315 -> "S"
-                in 315..360 -> "E"
-                else-> ""
-            }
-            //presure mb
-            pressure.text=weatherResponseModel.main.pressure.toString() +" mb"
-            feelsLike.text=weatherResponseModel.main.feelsLike.roundToInt().toString() +" °"
-            minMax.text="${weatherResponseModel.main.tempMin.roundToInt()}° / ${weatherResponseModel.main.tempMax.roundToInt()}°"
-            Country.text="${weatherResponseModel.name},${weatherResponseModel.sys.country}"
-            sunRise.text=getTimeFromStamp(weatherResponseModel.sys.sunrise.toLong())
-            sunSet.text=getTimeFromStamp(weatherResponseModel.sys.sunset.toLong())
-            searchView.setQuery(weatherResponseModel.name, false)
-
-
         }
     }
 
-    fun observeLiveData(){
+    fun observeLiveData() {
         viewModel.networkState.observe(this@MainActivity, Observer { it ->
             if (it != null) {
                 when (it.status) {
                     NetworkState.Status.RUNNING -> {
                         ProgressLoading.show(this)
-                        binding.noData.visibility=View.GONE
+                        binding.noData.visibility = View.GONE
                     } // LOADING
                     NetworkState.Status.SUCCESS -> {
                         ProgressLoading.dismiss()
-                        val data = it.data as? WeatherResponseModel
-                        bindData(data!!)
-                        binding.noData.visibility=View.GONE
+                        binding.noData.visibility = View.GONE
                     }// LOADED
                     NetworkState.Status.FAILED -> {
                         ProgressLoading.dismiss()
-                        bindData(WeatherResponseModel())
                         CustomToast.showErrorMessage(this, it.msg as String)
-                        binding.noData.visibility=View.VISIBLE
+                        binding.noData.visibility = View.VISIBLE
 
                     } // FAILED
                 }
                 viewModel._networkState.value = null
             }
+        })
+
+        viewModel.weatherData.observe(this@MainActivity, Observer {weatherResponseModel->
+            binding.humidity.text = weatherResponseModel.main.humidity.toString() + "%"
+            if (weatherResponseModel.weather.isNotEmpty()) {
+                binding.weatherDescription.text = weatherResponseModel.weather[0].description
+                binding.weatherIcon.visibility = View.VISIBLE
+                binding.weatherIcon.loadImage(
+                    "http://openweathermap.org/img/wn/${weatherResponseModel.weather[0].icon}@2x.png",
+                    getProcessDrawable(binding.weatherIcon.context)
+                )
+            } else {
+                binding.weatherDescription.text = ""
+                binding.weatherIcon.visibility = View.INVISIBLE
+            }
+            binding.temp.text = "${weatherResponseModel.main.temp.roundToInt()}\u00B0  "//for Fahrenheit  u2109 for celiouc u2103
+            binding.wind.text = "${weatherResponseModel.wind.speed} kmph"
+            binding.windDirection.WindowDirectionFromDegree(weatherResponseModel.wind.deg)
+            //presure mb
+            binding.pressure.text = weatherResponseModel.main.pressure.toString() + " mb"
+            binding.feelsLike.text = weatherResponseModel.main.feelsLike.roundToInt().toString() + " °"
+            binding.minMax.text =
+                "${weatherResponseModel.main.tempMin.roundToInt()}° / ${weatherResponseModel.main.tempMax.roundToInt()}°"
+            binding.Country.text = "${weatherResponseModel.name},${weatherResponseModel.sys.country}"
+            binding.sunRise.setTimeFromDateTimeStamp(weatherResponseModel.sys.sunrise.toLong())
+            binding.sunSet.setTimeFromDateTimeStamp(weatherResponseModel.sys.sunset.toLong())
+            binding.searchView.setQuery(weatherResponseModel.name, false)
+
         })
     }
 
@@ -132,7 +121,8 @@ class MainActivity : AppCompatActivity() ,LocationListener {
         locationManager = getSystemService(LOCATION_SERVICE) as LocationManager
 
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
-            != PackageManager.PERMISSION_GRANTED) {
+            != PackageManager.PERMISSION_GRANTED
+        ) {
             ActivityCompat.requestPermissions(
                 this,
                 arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
@@ -140,13 +130,18 @@ class MainActivity : AppCompatActivity() ,LocationListener {
             )
             return
         }
-        val location: Location? = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER)
+        val location: Location? =
+            locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER)
         if (location != null && location.time > Calendar.getInstance()
                 .timeInMillis - 5 * 60 * 1000
         ) {
             // Do something with the recent location fix
             //  otherwise wait for the update below
-            viewModel.getDataFromServer(null, location.latitude.toString(), location.longitude.toString())
+            viewModel.getDataFromServer(
+                null,
+                location.latitude.toString(),
+                location.longitude.toString()
+            )
         } else {
             locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0L, 0f, this)
         }
@@ -183,12 +178,6 @@ class MainActivity : AppCompatActivity() ,LocationListener {
     override fun onLocationChanged(location: Location) {
         Log.v("Location Changed", "${location.latitude} and  ${location.longitude}")
         locationManager.removeUpdates(this)
-    }
-
-    fun getTimeFromStamp(timestamp: Long) :String {
-        val calendar = Calendar.getInstance(Locale.ENGLISH)
-        calendar.timeInMillis = timestamp * 1000L
-        return DateFormat.format("hh:mm aa",calendar).toString()
     }
 
 }
