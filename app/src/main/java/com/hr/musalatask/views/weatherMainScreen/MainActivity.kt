@@ -7,7 +7,6 @@ import android.location.Location
 import android.location.LocationListener
 import android.location.LocationManager
 import android.os.Bundle
-import android.text.format.DateFormat
 import android.util.Log
 import android.view.View
 import androidx.activity.viewModels
@@ -19,7 +18,6 @@ import androidx.lifecycle.Observer
 import com.hr.musalatask.R
 import com.hr.musalatask.databinding.ActivityMainBinding
 import com.hr.musalatask.internet.NetworkState
-import com.hr.musalatask.model.WeatherResponseModel
 import com.hr.musalatask.utilities.*
 import dagger.hilt.android.AndroidEntryPoint
 import java.util.*
@@ -87,7 +85,7 @@ class MainActivity : AppCompatActivity(), LocationListener {
             }
         })
 
-        viewModel.weatherData.observe(this@MainActivity, Observer {weatherResponseModel->
+        viewModel.weatherData.observe(this@MainActivity, Observer { weatherResponseModel ->
             binding.humidity.text = weatherResponseModel.main.humidity.toString() + "%"
             if (weatherResponseModel.weather.isNotEmpty()) {
                 binding.weatherDescription.text = weatherResponseModel.weather[0].description
@@ -100,15 +98,18 @@ class MainActivity : AppCompatActivity(), LocationListener {
                 binding.weatherDescription.text = ""
                 binding.weatherIcon.visibility = View.INVISIBLE
             }
-            binding.temp.text = "${weatherResponseModel.main.temp.roundToInt()}\u00B0  "//for Fahrenheit  u2109 for celiouc u2103
+            binding.temp.text =
+                "${weatherResponseModel.main.temp.roundToInt()}\u00B0  "//for Fahrenheit  u2109 for celiouc u2103
             binding.wind.text = "${weatherResponseModel.wind.speed} kmph"
             binding.windDirection.WindowDirectionFromDegree(weatherResponseModel.wind.deg)
             //presure mb
             binding.pressure.text = weatherResponseModel.main.pressure.toString() + " mb"
-            binding.feelsLike.text = weatherResponseModel.main.feelsLike.roundToInt().toString() + " °"
+            binding.feelsLike.text =
+                weatherResponseModel.main.feelsLike.roundToInt().toString() + " °"
             binding.minMax.text =
                 "${weatherResponseModel.main.tempMin.roundToInt()}° / ${weatherResponseModel.main.tempMax.roundToInt()}°"
-            binding.Country.text = "${weatherResponseModel.name},${weatherResponseModel.sys.country}"
+            binding.Country.text =
+                "${weatherResponseModel.name},${weatherResponseModel.sys.country}"
             binding.sunRise.setTimeFromDateTimeStamp(weatherResponseModel.sys.sunrise.toLong())
             binding.sunSet.setTimeFromDateTimeStamp(weatherResponseModel.sys.sunset.toLong())
             binding.searchView.setQuery(weatherResponseModel.name, false)
@@ -117,8 +118,9 @@ class MainActivity : AppCompatActivity(), LocationListener {
     }
 
     fun getLocation() {
-
         locationManager = getSystemService(LOCATION_SERVICE) as LocationManager
+        val location: Location? =
+            locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER)
 
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
             != PackageManager.PERMISSION_GRANTED
@@ -130,8 +132,6 @@ class MainActivity : AppCompatActivity(), LocationListener {
             )
             return
         }
-        val location: Location? =
-            locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER)
         if (location != null && location.time > Calendar.getInstance()
                 .timeInMillis - 5 * 60 * 1000
         ) {
