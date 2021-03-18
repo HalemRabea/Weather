@@ -8,4 +8,6 @@
     <string name="needOfPerimission">Need location permission to show weather result of your location</string>
     <string name="location">Location</string>
     <string name="noDataFound">No data found</string>
+    <string name="sunSet">Sunset</string>
+    <string name="sunRise">Sunrise</string>
 </resources>

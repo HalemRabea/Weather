@@ -7,6 +7,7 @@ import android.location.Location
 import android.location.LocationListener
 import android.location.LocationManager
 import android.os.Bundle
+import android.text.format.DateFormat
 import android.util.Log
 import android.view.View
 import androidx.activity.viewModels
@@ -90,7 +91,9 @@ class MainActivity : AppCompatActivity() ,LocationListener {
             pressure.text=weatherResponseModel.main.pressure.toString() +" mb"
             feelsLike.text=weatherResponseModel.main.feelsLike.roundToInt().toString() +" °"
             minMax.text="${weatherResponseModel.main.tempMin.roundToInt()}° / ${weatherResponseModel.main.tempMax.roundToInt()}°"
-
+            Country.text="${weatherResponseModel.name},${weatherResponseModel.sys.country}"
+            sunRise.text=getTimeFromStamp(weatherResponseModel.sys.sunrise.toLong())
+            sunSet.text=getTimeFromStamp(weatherResponseModel.sys.sunset.toLong())
             searchView.setQuery(weatherResponseModel.name, false)
 
 
@@ -180,6 +183,12 @@ class MainActivity : AppCompatActivity() ,LocationListener {
     override fun onLocationChanged(location: Location) {
         Log.v("Location Changed", "${location.latitude} and  ${location.longitude}")
         locationManager.removeUpdates(this)
+    }
+
+    fun getTimeFromStamp(timestamp: Long) :String {
+        val calendar = Calendar.getInstance(Locale.ENGLISH)
+        calendar.timeInMillis = timestamp * 1000L
+        return DateFormat.format("hh:mm aa",calendar).toString()
     }
 
 }

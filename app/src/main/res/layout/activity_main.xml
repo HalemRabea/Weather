@@ -27,42 +27,54 @@
 
         <ImageView
             android:id="@+id/weatherIcon"
-            android:layout_width="50pt"
-            android:layout_height="50pt"
-            app:layout_constraintBottom_toTopOf="@+id/weatherDescription"
+            android:layout_width="wrap_content"
+            android:layout_height="0dp"
+            app:layout_constraintBottom_toBottomOf="@+id/minMax"
             app:layout_constraintEnd_toStartOf="@+id/temp"
             app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintHorizontal_chainStyle="packed"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/searchView"
-            tools:srcCompat="@tools:sample/avatars" />
+            app:layout_constraintTop_toTopOf="@+id/temp" />
+
 
         <TextView
             android:id="@+id/temp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
-            tools:text="18"
-            android:textSize="40sp"
+            android:layout_marginTop="16dp"
             android:textColor="@color/white"
-            app:layout_constraintBottom_toBottomOf="@+id/weatherIcon"
+            android:textSize="40sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintStart_toEndOf="@+id/weatherIcon"
-            app:layout_constraintTop_toTopOf="@+id/weatherIcon" />
+            app:layout_constraintTop_toBottomOf="@+id/searchView"
+            tools:text="18" />
 
+        <TextView
+            android:id="@+id/Country"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/terkwaz"
+            android:textSize="40sp"
+            android:layout_marginTop="12dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/minMax"
+            tools:text="Cairo,EG" />
 
         <TextView
             android:id="@+id/weatherDescription"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
             android:textColor="@color/terkwaz"
-            android:layout_marginBottom="16dp"
-            android:textSize="40sp"
-            tools:text="Mostly Cloudly"
+            android:textSize="20sp"
             app:layout_constraintBottom_toTopOf="@+id/guideline2"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent" />
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/Country"
+            tools:text="Mostly Cloudly" />
 
 
         <LinearLayout
@@ -182,6 +194,58 @@
                     android:layout_height="wrap_content"
                     android:textColor="@color/babyBlue"
                     tools:text="88%"/>
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/ic_sun"
+                    android:layout_margin="8dp"/>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/babyBlue"
+                    android:textSize="18sp"
+                    android:text="@string/sunRise"/>
+                <TextView
+                    android:id="@+id/sunRise"
+                    android:layout_width="wrap_content"
+                    android:textSize="18sp"
+                    android:layout_marginStart="6dp"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/babyBlue"
+                    tools:text="5:30 am"/>
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/ic_sun"
+                    android:layout_margin="8dp"/>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/babyBlue"
+                    android:textSize="18sp"
+                    android:text="@string/sunSet"/>
+                <TextView
+                    android:id="@+id/sunSet"
+                    android:layout_width="wrap_content"
+                    android:textSize="18sp"
+                    android:layout_marginStart="6dp"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/babyBlue"
+                    tools:text="5:30 am"/>
             </LinearLayout>
 
         </LinearLayout>

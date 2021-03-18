@@ -21,7 +21,7 @@ fun ImageView.loadImage(uri: String?, progressDrawable: CircularProgressDrawable
 
     val requestOptions = RequestOptions()
         .placeholder(progressDrawable)
-        .error(R.drawable.ic_broken_image)
+//        .error(R.drawable.ic_broken_image)
 
     Glide.with(context)
         .setDefaultRequestOptions(requestOptions)
